@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Item-wise Gross Profit Analysis</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --green-dark: #0a4a35;
+    --green-mid: #1a7a55;
+    --green-light: #e6f5ee;
+    --amber: #f5a623;
+    --amber-light: #fff8ec;
+    --red: #c0392b;
+    --red-light: #fdf0ee;
+    --blue: #1a4fa0;
+    --blue-light: #eef3fb;
+    --ink: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --bg: #f9f8f5;
+    --white: #ffffff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+  }
+
+  header {
+    background: var(--green-dark);
+    color: white;
+    padding: 2rem 2.5rem 1.5rem;
+    border-bottom: 4px solid var(--amber);
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+  }
+
+  header p {
+    font-size: 0.85rem;
+    opacity: 0.7;
+    margin-top: 4px;
+  }
+
+  .summary-bar {
+    display: flex;
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    flex: 1;
+    background: var(--white);
+    padding: 1rem 1.5rem;
+    text-align: center;
+  }
+
+  .stat-val {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--green-dark);
+  }
+
+  .stat-lbl {
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: var(--white);
+    border-bottom: 2px solid var(--border);
+    padding: 0 1.5rem;
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 0.85rem 1.2rem;
+    font-size: 0.82rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: all 0.2s;
+    margin-bottom: -2px;
+  }
+
+  .tab:hover { color: var(--ink); }
+  .tab.active { color: var(--green-dark); border-bottom-color: var(--green-dark); }
+  .tab.amber.active { color: #b36a00; border-bottom-color: var(--amber); }
+  .tab.blue.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab.red.active { color: var(--red); border-bottom-color: var(--red); }
+
+  .panel { display: none; padding: 1.5rem; }
+  .panel.active { display: block; }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 10px;
+    border-left: 4px solid;
+  }
+
+  .panel-header.green { background: var(--green-light); border-color: var(--green-mid); }
+  .panel-header.amber { background: var(--amber-light); border-color: var(--amber); }
+  .panel-header.blue { background: var(--blue-light); border-color: var(--blue); }
+  .panel-header.red { background: var(--red-light); border-color: var(--red); }
+
+  .panel-header h2 { font-size: 1rem; font-weight: 600; }
+  .panel-header p { font-size: 0.78rem; color: var(--muted); margin-top: 3px; }
+
+  .badge {
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .badge.green { background: var(--green-dark); color: white; }
+  .badge.amber { background: var(--amber); color: white; }
+  .badge.blue { background: var(--blue); color: white; }
+  .badge.red { background: var(--red); color: white; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.82rem;
+    background: var(--white);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+  }
+
+  thead tr {
+    background: var(--ink);
+    color: white;
+    text-align: left;
+  }
+
+  thead th {
+    padding: 10px 14px;
+    font-weight: 500;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+  tbody tr:hover { background: #f3f4f6; }
+
+  td {
+    padding: 9px 14px;
+    vertical-align: middle;
+  }
+
+  .item-name { font-weight: 500; color: var(--ink); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  .gp-pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 54px;
+  }
+
+  .gp-high { background: var(--green-light); color: var(--green-dark); }
+  .gp-mid { background: var(--blue-light); color: var(--blue); }
+  .gp-low { background: #f3f4f6; color: var(--muted); }
+  .gp-loss { background: var(--red-light); color: var(--red); }
+
+  .bar-wrap {
+    width: 90px;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+    display: inline-block;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.4s;
+  }
+
+  .rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: 0.7rem;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .note-box {
+    margin-top: 1rem;
+    padding: 0.85rem 1.1rem;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .note-box.green { background: var(--green-light); color: var(--green-dark); }
+  .note-box.amber { background: var(--amber-light); color: #7a4500; }
+  .note-box.red { background: var(--red-light); color: var(--red); }
+
+  @media (max-width: 600px) {
+    .bar-wrap { display: none; }
+    .summary-bar { flex-wrap: wrap; }
+    .stat { min-width: 50%; }
+    header { padding: 1.25rem 1rem; }
+    .panel { padding: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Item-wise Gross Profit Analysis</h1>
+  <p>Retail strategy dashboard — based on 1-month sales data</p>
+</header>
+
+<div class="summary-bar">
+  <div class="stat"><div class="stat-val">3,669</div><div class="stat-lbl">Total items</div></div>
+  <div class="stat"><div class="stat-val">₹1.57 Cr</div><div class="stat-lbl">Total sales</div></div>
+  <div class="stat"><div class="stat-val">₹14.5 L</div><div class="stat-lbl">Total gross profit</div></div>
+  <div class="stat"><div class="stat-val">9.21%</div><div class="stat-lbl">Avg GP%</div></div>
+  <div class="stat"><div class="stat-val" style="color:var(--red);">105</div><div class="stat-lbl">Loss-making items</div></div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('high')">⭐ High Margin (&gt;15%)</div>
+  <div class="tab amber" onclick="showTab('mid')">📦 Mid Margin (8–15%)</div>
+  <div class="tab blue" onclick="showTab('low')">🔄 High Volume / Low Margin</div>
+  <div class="tab red" onclick="showTab('loss')">⚠️ Loss Making</div>
+</div>
+
+<!-- HIGH MARGIN -->
+<div class="panel active" id="panel-high">
+  <div class="panel-header green">
+    <div>
+      <h2>⭐ High Margin Items — Push these in retail!</h2>
+      <p>GP above 15% — these are your profit engines. Promote, bundle, and upsell these items.</p>
+    </div>
+    <span class="badge green">25 items</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Name</th>
+        <th class="num">Sales (₹)</th>
+        <th class="num">Gross Profit (₹)</th>
+        <th class="num">GP%</th>
+        <th>Margin Bar</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="high-body"></tbody>
+  </table>
+  <div class="note-box green">💡 <strong>Strategy:</strong> These items have high margins but may have lower sales — because you haven't been pushing them enough. Feature them on WhatsApp, place them near the billing counter, and include them in bundle packs.</div>
+</div>
+
+<!-- MID MARGIN -->
+<div class="panel" id="panel-mid">
+  <div class="panel-header amber">
+    <div>
+      <h2>📦 Mid Margin Items — Bundle anchors</h2>
+      <p>GP between 8–15% — solid performers. Use these as the backbone of your bundle packs.</p>
+    </div>
+    <span class="badge amber">25 items</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Name</th>
+        <th class="num">Sales (₹)</th>
+        <th class="num">Gross Profit (₹)</th>
+        <th class="num">GP%</th>
+        <th>Margin Bar</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="mid-body"></tbody>
+  </table>
+  <div class="note-box amber">💡 <strong>Strategy:</strong> Pair these mid-margin items with your high-margin spices/dry fruits in bundle packs. The customer buys dal/rice (mid margin) and you attach jeera/hing (high margin) — your blended margin improves significantly.</div>
+</div>
+
+<!-- LOW MARGIN HIGH VOLUME -->
+<div class="panel" id="panel-low">
+  <div class="panel-header blue">
+    <div>
+      <h2>🔄 High Volume / Low Margin Items</h2>
+      <p>GP between 1–8% — customer magnets that bring footfall. Use as bundle anchors only.</p>
+    </div>
+    <span class="badge blue">25 items</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Name</th>
+        <th class="num">Sales (₹)</th>
+        <th class="num">Gross Profit (₹)</th>
+        <th class="num">GP%</th>
+        <th>Margin Bar</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="low-body"></tbody>
+  </table>
+  <div class="note-box" style="background:var(--blue-light);color:var(--blue);">💡 <strong>Strategy:</strong> These are footfall drivers — customers come for sugar, ghee, oil. That's fine. But never sell these alone to a retail customer. Always attach a high-margin item at billing. These are also your institutional sale staples — don't rely on them for retail profit.</div>
+</div>
+
+<!-- LOSS MAKING -->
+<div class="panel" id="panel-loss">
+  <div class="panel-header red">
+    <div>
+      <h2>⚠️ Loss-Making Items — Immediate action needed</h2>
+      <p>Negative GP — you are paying to sell these. Fix pricing or stop stocking.</p>
+    </div>
+    <span class="badge red">105 items</span>
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Item Name</th>
+        <th class="num">Sales (₹)</th>
+        <th class="num">Loss (₹)</th>
+        <th class="num">GP%</th>
+        <th>Priority</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="loss-body"></tbody>
+  </table>
+  <div class="note-box red">⚠️ <strong>Urgent:</strong> Top 5 loss-making items by value — fix these first. Panghat 15kg alone is costing you ₹5,337/month. Check if your purchase price has increased without updating your selling price. For branded FMCG items (Surf, Dettol, Rin) — either get better purchase rates or stop stocking them.</div>
+</div>
+
+<script>
+const highItems = [
+  ["Jeera Sp Loose", 63201, 26028, 41.2, "Push on WhatsApp"],
+  ["Gola Baruda", 156830, 23800, 15.2, "Bundle & promote"],
+  ["Hing Ramdev 100gm", 82736, 20148, 24.4, "Feature at counter"],
+  ["Magaj Moti", 96911, 16454, 17.0, "Bundle in dry fruits pack"],
+  ["Red Rose Tibar Rice 30kg", 89204, 16163, 18.1, "Push over low-margin rice"],
+  ["Leaf Plate (30×10)", 95400, 15173, 15.9, "Sell to institutions too"],
+  ["Phool Makhana 100gm", 16685, 10213, 61.2, "Huge margin — push hard"],
+  ["Plate Buffer 4cp 13\"", 57580, 9875, 17.2, "Institutional upsell"],
+  ["Kaju 2 Tukra 500g", 21476, 9812, 45.7, "Premium retail item"],
+  ["Kaju Sabut 500gm W320", 36960, 8090, 21.9, "Bundle in dry fruits pack"],
+  ["Jeera Loose 250gm", 15974, 7020, 43.9, "Include in every spice pack"],
+  ["Mix Pickle Pachranga 4.5kg", 28810, 6310, 21.9, "Institutional & retail"],
+  ["Kaju Sabut 250gm W320", 26255, 5930, 22.6, "Gift packs"],
+  ["Kismis 250gm", 15649, 5462, 34.9, "Add to dry fruit bundle"],
+  ["Silver Plate 6\" 180gsm", 21380, 5186, 24.3, "Temple/event sales"],
+  ["Vrat Atta Loose", 23968, 5014, 20.9, "Seasonal push"],
+  ["Elaichi 50gm", 18350, 4908, 26.7, "High margin spice — push"],
+  ["Mirch Sabut Teja 1kg", 28372, 4697, 16.6, "Spice bundle"],
+  ["Ararot Blue Food Grade", 25093, 4634, 18.5, "Niche — promote"],
+  ["Jeera Powder Loose", 15300, 4180, 27.3, "Always bundle with dal"],
+  ["Saunf Moti 250gm", 9580, 4006, 41.8, "Spice bundle item"],
+  ["Dhaniya Sabut Sp 250g", 7845, 2743, 35.0, "Spice pack staple"],
+  ["Ajwain 100g", 5816, 2752, 47.3, "Small but mighty margin"],
+  ["Kismis Long 500gm", 4150, 4150, 100.0, "Check — possible data issue"],
+  ["Gatta", 8260, 8260, 100.0, "Check — possible data issue"],
+];
+
+const midItems = [
+  ["Daawat Rozana Rice 10kg", 236820, 25861, 10.9, "Top bundle anchor"],
+  ["Chole Golden Loose 1kg", 94254, 10587, 11.2, "Good retail item"],
+  ["Kaju 8 Tukra CSP", 93115, 10424, 11.2, "Dry fruits bundle"],
+  ["Red Rose Premium Rice 30kg", 87782, 9794, 11.2, "Push over low margin rice"],
+  ["Gunjal Sella Rice 1121 30kg", 57872, 8204, 14.2, "Promote actively"],
+  ["Chana Dal Loose 1kg", 92906, 7960, 8.6, "Kitchen essentials pack"],
+  ["Sunflower Oil Good Health 15kg", 92286, 7857, 8.5, "Better than Fortune oil"],
+  ["Groundnut Oil JMD+Diamond 15kg", 87771, 7771, 8.9, "Decent margin oil"],
+  ["Chole Red Loose 1kg", 90378, 7264, 8.0, "Bundle with rice"],
+  ["Akhrot Giri 250gm", 70770, 7020, 9.9, "Dry fruits bundle"],
+  ["Phool Makhana Handpick 250g", 69230, 6378, 9.2, "Premium snack — push"],
+  ["Rajma Desi Red Loose 1kg", 67528, 5918, 8.8, "Good retail item"],
+  ["Kala Chana Loose", 46895, 5145, 11.0, "Bundle with dal items"],
+  ["Red Rose Classic Rice 30kg", 37895, 5031, 13.3, "Mid-tier rice — promote"],
+  ["Aryaveer Mustard Oil 5L×4", 48833, 5011, 10.3, "Mustard oil — push retail"],
+  ["Basmati Rice 2no. 30kg", 35990, 4895, 13.6, "Premium rice segment"],
+  ["Kuttu Giri Atta", 35121, 4752, 13.5, "Seasonal/specialty item"],
+  ["Basmati Rice 1no. 30kg", 32020, 4618, 14.4, "Best basmati margin"],
+  ["Urad Sabut Loose 1kg", 43476, 4592, 10.6, "Dal bundle item"],
+  ["Samak Rice Loose 1kg", 32289, 4332, 13.4, "Specialty — vrat season"],
+  ["Gur Choti Pedi Loose", 33286, 3962, 11.9, "Retail-friendly item"],
+  ["Bisleri Water Bottle 250ml×48", 36220, 3901, 10.8, "Institutional add-on"],
+  ["Deggi Mirch MDH 100gm", 41211, 3887, 9.4, "Branded spice — push"],
+  ["Masoor Dal 1kg", 30269, 3629, 12.0, "Dal bundle"],
+  ["Mix Dal 1kg", 23110, 3452, 14.9, "Best dal margin item"],
+];
+
+const lowItems = [
+  ["Madhusudan Ghee 15kg", 681857, 13390, 2.0, "Footfall driver only"],
+  ["Sugar (Loose)", 646649, 9780, 1.5, "Volume — attach high GP item"],
+  ["Fortune Tin Soyabean Oil", 522886, 15139, 2.9, "Institutional staple"],
+  ["Kaju 2 Tukra JH", 199146, 6575, 3.3, "Bulk — margin too low"],
+  ["Atta Chakki Jai Mataji 50kg", 158552, 7505, 4.7, "Bundle with spices"],
+  ["Arhar Dal 1kg", 143719, 9100, 6.3, "Kitchen pack anchor"],
+  ["Best Choice Palm Oil 15kg", 130943, 3640, 2.8, "Low margin — institutional"],
+  ["Tata Salt 1kg", 129213, 3391, 2.6, "Always include in packs"],
+  ["Maida Fortune 50kg", 124627, 4152, 3.3, "Institutional use"],
+  ["Sella Dubar 244-D Rice 30kg", 123160, 9762, 7.9, "Near mid-margin — watch"],
+  ["Kaju 4 Tukda/SKC Tulsi", 110438, 3526, 3.2, "Margin too low for retail push"],
+  ["Badam Independent Loose", 107634, 3837, 3.6, "Dry fruit anchor — low GP"],
+  ["Rajma Rajat Ginni Loose 30kg", 102430, 3897, 3.8, "Bulk staple"],
+  ["Moong Dhuli Medium", 95790, 5876, 6.1, "Dal pack item"],
+  ["Ananda Ghee 850ml 18×peti", 95400, 4270, 4.5, "Better than 15kg ghee GP"],
+  ["Besan Barik Rajdhani 35kg", 93940, 4599, 4.9, "Institutional/bakers"],
+  ["Independence Chakki Atta 10kg", 88115, 1575, 1.8, "Very low margin — review"],
+  ["Moong Chilka 1kg", 76293, 3840, 5.0, "Average — bundle it"],
+  ["Kismis BHK", 75682, 3715, 4.9, "Sell smaller packs for better GP"],
+  ["Kaju Sabut W210 Loose", 73390, 2463, 3.4, "Bulk — low retail margin"],
+  ["Moong Dhuli 1kg", 70408, 3553, 5.0, "Dal pack"],
+  ["Copy Delta Chalte Raho 30m", 67320, 4085, 6.1, "Stationery — decent margin"],
+  ["Besan Mota Rajdhani 35kg", 64957, 4707, 7.2, "Near mid-margin"],
+  ["Ashirwad Atta 10kg", 64947, 714, 1.1, "Extremely low — review pricing"],
+  ["Fortune Refined 750gm×20", 61190, 3218, 5.3, "Average branded oil margin"],
+];
+
+const lossItems = [
+  ["Panghat 15kg", 178762, -5337, -3.0, "🔴 Urgent — fix price now"],
+  ["Tata Turmeric 500g", 41519, -2665, -6.4, "🔴 Stop or fix price"],
+  ["Lays ASCO Green 10m", 8461, -937, -11.1, "🟠 Stop stocking"],
+  ["Godrej Fab Liquid 1L", 4958, -858, -17.3, "🟠 Stop stocking"],
+  ["Container Diamond Big 660ml", 6746, -799, -11.8, "🟠 Stop stocking"],
+  ["Container Diamond Small 450ml", 5830, -689, -11.8, "🟠 Stop stocking"],
+  ["Shrishtiwrap Aluminium Foil 1kg", 15856, -596, -3.8, "🟠 Fix purchase price"],
+  ["Surf Excel Surf 10p×12", 11851, -563, -4.8, "🟠 Review MRP compliance"],
+  ["Sugar Independence 5kg", 100079, -530, -0.5, "🔴 High volume loss!"],
+  ["Rin Soap 10×84pc", 5317, -486, -9.2, "🟠 Stop stocking"],
+  ["Bajaj Almond Hair Oil 475ml", 10958, -370, -3.4, "🟡 Fix or drop"],
+  ["Butter Pepar Real 20+5mtr", 7940, -368, -4.6, "🟡 Fix or drop"],
+  ["Rin Soap 250g×5", 3132, -341, -10.9, "🟠 Stop stocking"],
+  ["Doodh Biscuit Patanjali 10m×100", 2126, -339, -16.0, "🟠 Stop stocking"],
+  ["Garnier Face Wash 50ml", 360, -334, -92.9, "🔴 Massive loss% — stop"],
+  ["Vim Soap 4pc Set", 4817, -314, -6.5, "🟠 Review"],
+  ["Glucon-D Lime 1kg", 3322, -270, -8.1, "🟡 Low sales — drop"],
+  ["All Out Machine Ultra", 8118, -233, -2.9, "🟡 Fix purchase rate"],
+  ["Nescafe Gold 100gm", 1381, -230, -16.6, "🟠 Stop stocking"],
+  ["TATA Cashew 500gm", 2143, -212, -9.9, "🟠 Source better"],
+  ["Aloo Chips 200g", 1140, -111, -9.7, "🟡 Low priority"],
+  ["Chilly Powder Tata 500g", 16290, -110, -0.7, "🟡 Fix purchase rate"],
+  ["Dettol Handwash 875ml", 1566, -106, -6.8, "🟠 Stop stocking"],
+  ["Maggi Noodles 15m×96s", 13555, -104, -0.8, "🟡 Review pricing"],
+  ["Hit Black 400ml", 8685, -19, -0.2, "🟡 Minor — fix easily"],
+];
+
+function fmt(n) {
+  if (Math.abs(n) >= 100000) return '₹' + (n/100000).toFixed(1) + 'L';
+  if (Math.abs(n) >= 1000) return '₹' + Math.round(n/1000) + 'K';
+  return '₹' + Math.round(n);
+}
+
+function renderTable(data, bodyId, type) {
+  const body = document.getElementById(bodyId);
+  const maxSales = Math.max(...data.map(d => Math.abs(d[1])));
+
+  data.forEach((row, i) => {
+    const [name, sales, gp, gpPct, action] = row;
+    const absGP = Math.abs(gpPct);
+    const barWidth = type === 'loss' ? Math.min(100, absGP * 2) : Math.min(100, gpPct * 1.5);
+    const barColor = type === 'loss' ? '#c0392b' : gpPct >= 15 ? '#1a7a55' : gpPct >= 8 ? '#1a4fa0' : '#9ca3af';
+    const gpClass = type === 'loss' ? 'gp-loss' : gpPct >= 15 ? 'gp-high' : gpPct >= 8 ? 'gp-mid' : 'gp-low';
+    const rankBg = i < 3 ? (type === 'loss' ? '#fdf0ee' : '#e6f5ee') : '#f3f4f6';
+    const rankColor = i < 3 ? (type === 'loss' ? '#c0392b' : '#0a4a35') : '#6b7280';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><span class="rank" style="background:${rankBg};color:${rankColor}">${i+1}</span></td>
+      <td class="item-name">${name}</td>
+      <td class="num">${fmt(sales)}</td>
+      <td class="num" style="color:${type==='loss'?'#c0392b':'#0a4a35'}">${fmt(gp)}</td>
+      <td class="num"><span class="gp-pill ${gpClass}">${gpPct > 0 ? '+' : ''}${gpPct.toFixed(1)}%</span></td>
+      <td>
+        <div class="bar-wrap">
+          <div class="bar-fill" style="width:${barWidth}%;background:${barColor}"></div>
+        </div>
+      </td>
+      <td style="font-size:0.75rem;color:${type==='loss'?'#c0392b':'#374151'}">${action}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
+renderTable(highItems, 'high-body', 'high');
+renderTable(midItems, 'mid-body', 'mid');
+renderTable(lowItems, 'low-body', 'low');
+renderTable(lossItems, 'loss-body', 'loss');
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const tabs = ['high','mid','low','loss'];
+  document.querySelectorAll('.tab')[tabs.indexOf(name)].classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+}
+</script>
+</body>
+</html>

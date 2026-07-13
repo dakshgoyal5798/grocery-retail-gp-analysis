@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bundle Offers — Retail Strategy</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Noto+Sans:wght@300;400;500&display=swap');
+
+:root {
+  --saffron: #E8761A;
+  --saffron-light: #FFF3E8;
+  --green: #1B6B3A;
+  --green-light: #E8F5EE;
+  --ink: #1A1A1A;
+  --muted: #6B7280;
+  --border: #E5E7EB;
+  --bg: #FAFAF8;
+  --white: #FFFFFF;
+  --red: #C0392B;
+  --gold: #D4A017;
+  --gold-light: #FDF8EC;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Noto Sans', sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(135deg, #1B6B3A 0%, #0d4022 100%);
+  color: white;
+  padding: 2rem 2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+.header::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 200px; height: 200px;
+  background: rgba(232,118,26,0.15);
+  border-radius: 50%;
+}
+.header h1 {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  position: relative;
+}
+.header p { font-size: 0.85rem; opacity: 0.75; margin-top: 4px; position: relative; }
+
+/* SUMMARY STRIP */
+.strip {
+  display: flex;
+  gap: 1px;
+  background: var(--border);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+}
+.strip-item {
+  flex: 1;
+  min-width: 120px;
+  background: var(--white);
+  padding: 0.85rem 1rem;
+  text-align: center;
+}
+.strip-val { font-size: 1.3rem; font-weight: 700; color: var(--green); }
+.strip-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 2px; }
+
+/* SECTION HEADER */
+.sec-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 1.5rem 1.5rem 0.75rem;
+}
+.sec-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.sec-head h2 { font-family: 'Baloo 2', sans-serif; font-size: 1.1rem; font-weight: 700; }
+.sec-head p { font-size: 0.78rem; color: var(--muted); margin-top: 1px; }
+
+/* BUNDLE GRID */
+.bundle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+  padding: 0 1.5rem 1.5rem;
+}
+
+/* BUNDLE CARD */
+.bundle-card {
+  background: var(--white);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border: 1.5px solid var(--border);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.bundle-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.11);
+}
+
+.card-top {
+  padding: 1rem 1.1rem 0.75rem;
+  position: relative;
+}
+.bundle-emoji { font-size: 1.5rem; margin-bottom: 6px; }
+.bundle-name {
+  font-family: 'Baloo 2', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ink);
+  line-height: 1.2;
+}
+.bundle-tagline { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+
+.best-badge {
+  position: absolute;
+  top: 10px; right: 10px;
+  background: var(--saffron);
+  color: white;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+}
+
+/* ITEMS LIST */
+.items-section {
+  padding: 0 1.1rem;
+}
+.item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+  border-bottom: 1px dashed var(--border);
+  font-size: 0.78rem;
+}
+.item-row:last-child { border-bottom: none; }
+.item-left { display: flex; align-items: center; gap: 6px; color: var(--ink); }
+.item-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.item-qty { font-size: 0.7rem; color: var(--muted); }
+.gp-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.gp-h { background: var(--green-light); color: var(--green); }
+.gp-m { background: #EEF3FB; color: #1A4FA0; }
+.gp-l { background: #F3F4F6; color: var(--muted); }
+
+/* PRICING SECTION */
+.pricing {
+  margin: 0.75rem 1.1rem 0;
+  padding: 0.75rem;
+  background: var(--bg);
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 6px;
+  text-align: center;
+}
+.p-val { font-size: 1rem; font-weight: 700; }
+.p-lbl { font-size: 0.65rem; color: var(--muted); }
+.p-val.price { color: var(--green); }
+.p-val.margin { color: var(--saffron); }
+.p-val.profit { color: var(--ink); }
+
+/* WHATSAPP MSG */
+.wa-section {
+  margin: 0.75rem 1.1rem 1rem;
+}
+.wa-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 5px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.wa-msg {
+  background: #E9FBF0;
+  border-left: 3px solid #25D366;
+  border-radius: 0 8px 8px 0;
+  padding: 8px 10px;
+  font-size: 0.75rem;
+  color: #1A3A26;
+  line-height: 1.5;
+  cursor: pointer;
+  transition: background 0.15s;
+  position: relative;
+}
+.wa-msg:hover { background: #D4F5E2; }
+.copy-hint {
+  font-size: 0.65rem;
+  color: #25D366;
+  font-weight: 600;
+  margin-top: 4px;
+  display: block;
+}
+
+/* DIVIDER */
+.divider {
+  height: 8px;
+  background: var(--border);
+  margin: 0.5rem 0;
+}
+
+/* PRINT / SHARE */
+.action-bar {
+  display: flex;
+  gap: 8px;
+  padding: 1rem 1.5rem 2rem;
+  flex-wrap: wrap;
+}
+.btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: 'Noto Sans', sans-serif;
+  transition: all 0.2s;
+}
+.btn-green { background: var(--green); color: white; }
+.btn-green:hover { background: #0d4022; }
+.btn-outline { background: var(--white); color: var(--ink); border: 1.5px solid var(--border); }
+.btn-outline:hover { border-color: var(--ink); }
+
+.toast {
+  position: fixed;
+  bottom: 1.5rem; left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--ink);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  transition: transform 0.3s;
+  z-index: 999;
+  pointer-events: none;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+
+@media print {
+  .action-bar, .copy-hint, .wa-label { display: none; }
+}
+
+@media (max-width: 500px) {
+  .bundle-grid { grid-template-columns: 1fr; padding: 0 1rem 1rem; }
+  .header h1 { font-size: 1.4rem; }
+  .strip-item { min-width: 100px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🛒 Bundle Offers Catalogue</h1>
+  <p>8 ready-to-sell packs — with blended margins, pricing & WhatsApp messages</p>
+</div>
+
+<div class="strip">
+  <div class="strip-item"><div class="strip-val">8</div><div class="strip-lbl">Bundle packs</div></div>
+  <div class="strip-item"><div class="strip-val">9% → 22%</div><div class="strip-lbl">Margin uplift</div></div>
+  <div class="strip-item"><div class="strip-val">₹699–₹3,499</div><div class="strip-lbl">Price range</div></div>
+  <div class="strip-item"><div class="strip-val">All items in stock</div><div class="strip-lbl">Based on your data</div></div>
+</div>
+
+<!-- SECTION 1: DAILY USE -->
+<div class="sec-head">
+  <div class="sec-icon" style="background:#E8F5EE;">🏠</div>
+  <div>
+    <h2>Daily Use Packs — High volume, easy sell</h2>
+    <p>Target: every household customer. These move fast.</p>
+  </div>
+</div>
+
+<div class="bundle-grid" id="daily-grid"></div>
+<div class="divider"></div>
+
+<!-- SECTION 2: PREMIUM -->
+<div class="sec-head">
+  <div class="sec-icon" style="background:#FDF8EC;">🌟</div>
+  <div>
+    <h2>Premium & Gift Packs — High margin, high value</h2>
+    <p>Target: gifting occasions, festivals, households wanting quality.</p>
+  </div>
+</div>
+
+<div class="bundle-grid" id="premium-grid"></div>
+<div class="divider"></div>
+
+<!-- SECTION 3: SPICE -->
+<div class="sec-head">
+  <div class="sec-icon" style="background:#FFF3E8;">🌶️</div>
+  <div>
+    <h2>Spice & Masala Packs — Best margins in the store</h2>
+    <p>Target: every cooking household. Repeat monthly purchase.</p>
+  </div>
+</div>
+
+<div class="bundle-grid" id="spice-grid"></div>
+<div class="divider"></div>
+
+<!-- SECTION 4: FESTIVAL -->
+<div class="sec-head">
+  <div class="sec-icon" style="background:#F0F4FF;">🪔</div>
+  <div>
+    <h2>Vrat & Festival Pack — Seasonal high-margin opportunity</h2>
+    <p>Target: fasting customers, temple buyers, religious occasions.</p>
+  </div>
+</div>
+
+<div class="bundle-grid" id="festival-grid"></div>
+
+<div class="action-bar">
+  <button class="btn btn-green" onclick="window.print()">🖨️ Print All Packs</button>
+  <button class="btn btn-outline" onclick="copyAll()">📋 Copy All WhatsApp Messages</button>
+</div>
+
+<div class="toast" id="toast">✅ Copied to clipboard!</div>
+
+<script>
+const bundles = {
+  daily: [
+    {
+      emoji: "🍚",
+      name: "Monthly Kitchen Essentials Pack",
+      tagline: "Dal, chawal, tel, namak + key spices — all in one",
+      best: true,
+      price: 1999,
+      items: [
+        { name: "Daawat Rozana Rice 5kg", qty: "5kg", gp: 10.9, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Arhar Dal", qty: "1kg", gp: 6.3, gpClass: "gp-l", color: "#9CA3AF" },
+        { name: "Chana Dal", qty: "500g", gp: 8.6, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Tata Salt", qty: "1kg", gp: 2.6, gpClass: "gp-l", color: "#9CA3AF" },
+        { name: "Jeera Sp Loose", qty: "250g", gp: 41.2, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Hing Ramdev 100g", qty: "100g", gp: 24.4, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Dhaniya Sabut Sp", qty: "250g", gp: 35.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Ajwain", qty: "100g", gp: 47.3, gpClass: "gp-h", color: "#1B6B3A" },
+      ],
+      blendedGP: 16,
+      profit: 320,
+      wa: "🛒 *Monthly Kitchen Essentials Pack — ₹1,999 only!*\n\nDaawat Rice 5kg + Arhar Dal 1kg + Chana Dal 500g + Namak + Jeera + Hing + Dhaniya + Ajwain\n\n✅ Poore mahine ki zaroorat ek pack mein\n✅ Fresh stock, best quality\n\nOrder karo aaj 📲 Limited stock!"
+    },
+    {
+      emoji: "🫘",
+      name: "Dal & Pulses Family Pack",
+      tagline: "5 dals — whole month sorted",
+      price: 1199,
+      items: [
+        { name: "Arhar Dal", qty: "1kg", gp: 6.3, gpClass: "gp-l", color: "#9CA3AF" },
+        { name: "Chana Dal Loose", qty: "1kg", gp: 8.6, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Moong Dhuli", qty: "500g", gp: 30.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Masoor Dal", qty: "500g", gp: 23.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Mix Dal", qty: "500g", gp: 14.9, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Urad Sabut", qty: "500g", gp: 28.1, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Chole Golden", qty: "500g", gp: 11.2, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Rajma Desi Red", qty: "500g", gp: 8.8, gpClass: "gp-m", color: "#1A4FA0" },
+      ],
+      blendedGP: 17,
+      profit: 204,
+      wa: "🫘 *Dal & Pulses Family Pack — ₹1,199 only!*\n\nArhar + Chana + Moong + Masoor + Mix Dal + Urad + Chole + Rajma\n\n✅ 8 types of dal in one pack\n✅ Healthy, fresh, daily cooking sorted\n\n📲 WhatsApp pe order karo, ghar pe milega!"
+    },
+  ],
+  premium: [
+    {
+      emoji: "🥜",
+      name: "Dry Fruits Premium Gift Pack",
+      tagline: "Kaju, badam, kismis, akhrot — perfect gift",
+      best: true,
+      price: 1499,
+      items: [
+        { name: "Kaju Sabut W320", qty: "250g", gp: 22.6, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Badam Giri Moti", qty: "250g", gp: 20.4, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kismis 250g", qty: "250g", gp: 34.9, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Akhrot Giri", qty: "250g", gp: 9.9, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Pista Roasted", qty: "250g", gp: 26.9, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Magaj Moti", qty: "100g", gp: 17.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Anjeer (Natures)", qty: "250g", gp: 21.6, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Munakka", qty: "250g", gp: 24.3, gpClass: "gp-h", color: "#1B6B3A" },
+      ],
+      blendedGP: 22,
+      profit: 330,
+      wa: "🎁 *Premium Dry Fruits Gift Pack — ₹1,499*\n\nKaju + Badam + Kismis + Akhrot + Pista + Magaj + Anjeer + Munakka\n\n✅ Perfect for gifting — birthdays, puja, shaadi\n✅ Fresh & quality guaranteed\n✅ Beautiful packing available\n\nPre-order karo 📲 — Festival season mein stock jaldi khatam hota hai!"
+    },
+    {
+      emoji: "☕",
+      name: "Makhana & Healthy Snacks Pack",
+      tagline: "Trending health snacks — high margin, easy sell",
+      price: 899,
+      items: [
+        { name: "Phool Makhana 100g", qty: "100g×2", gp: 61.2, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Pumpkin Seeds", qty: "100g", gp: 37.1, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Bhuna Chana 500g", qty: "250g", gp: 19.6, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Moongfali Dana", qty: "500g", gp: 32.5, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kaju 2 Tukra", qty: "250g", gp: 45.7, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kismis 250g", qty: "250g", gp: 34.9, gpClass: "gp-h", color: "#1B6B3A" },
+      ],
+      blendedGP: 38,
+      profit: 342,
+      wa: "🌟 *Healthy Snacks Pack — ₹899*\n\nMakhana 200g + Pumpkin Seeds + Bhuna Chana + Moongfali + Kaju + Kismis\n\nGhar mein rakhne ke liye best!\n✅ Healthy snacking\n✅ Gym & diet friendly\n✅ Kids bhi khayenge\n\n📲 Order karo aaj!"
+    },
+    {
+      emoji: "🍵",
+      name: "Tea & Breakfast Premium Pack",
+      tagline: "Morning essentials — repeat monthly buy",
+      price: 699,
+      items: [
+        { name: "Tata Tea Premium 500g", qty: "500g", gp: 18.5, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Tetley Tea Bags 100pc", qty: "100pc", gp: 19.8, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Atta Chakki Jai Mataji", qty: "5kg", gp: 4.7, gpClass: "gp-l", color: "#9CA3AF" },
+        { name: "Tata Salt 1kg", qty: "1kg", gp: 2.6, gpClass: "gp-l", color: "#9CA3AF" },
+        { name: "Elaichi 50g", qty: "50g", gp: 26.7, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Gur Choti Pedi Loose", qty: "500g", gp: 11.9, gpClass: "gp-m", color: "#1A4FA0" },
+      ],
+      blendedGP: 14,
+      profit: 98,
+      wa: "☕ *Tea & Breakfast Pack — sirf ₹699!*\n\nTata Tea 500g + Tetley Tea Bags + Chakki Atta 5kg + Namak + Elaichi + Gur\n\n✅ Subah ki shuruaat perfect\n✅ Poore mahine ka breakfast sorted\n\nAaj hi order karo 📲"
+    },
+  ],
+  spice: [
+    {
+      emoji: "🌶️",
+      name: "Complete Spice Box Pack",
+      tagline: "Saare masale ek baar — 35%+ blended margin!",
+      best: true,
+      price: 799,
+      items: [
+        { name: "Jeera Sp Loose", qty: "250g", gp: 41.2, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Hing Ramdev 100g", qty: "100g", gp: 24.4, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Dhaniya Sabut Sp", qty: "250g", gp: 35.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Ajwain", qty: "100g", gp: 47.3, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Saunf Moti", qty: "250g", gp: 41.8, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kali Mirch Sabut", qty: "100g", gp: 28.7, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Elaichi 25g", qty: "25g", gp: 28.8, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Jeera Powder Loose", qty: "100g", gp: 27.3, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Panchporan", qty: "100g", gp: 27.1, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kasturi Methi Loose", qty: "50g", gp: 19.7, gpClass: "gp-h", color: "#1B6B3A" },
+      ],
+      blendedGP: 35,
+      profit: 280,
+      wa: "🌶️ *Complete Spice Box Pack — ₹799 only!*\n\nJeera + Hing + Dhaniya + Ajwain + Saunf + Kali Mirch + Elaichi + Jeera Powder + Panchporan + Kasturi Methi\n\n✅ Poore saal ke masale ek baar mein\n✅ Fresh grinding se zyada asli aur mehkdar\n✅ Ghar ki rasoi ke liye perfect\n\nSirf ₹799! Order karo 📲"
+    },
+    {
+      emoji: "🧄",
+      name: "Basic Masala Starter Pack",
+      tagline: "5 most-used spices — best seller for new customers",
+      price: 399,
+      items: [
+        { name: "Jeera Sp Loose", qty: "100g", gp: 41.2, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Hing Ramdev 50g", qty: "50g", gp: 30.3, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Ajwain", qty: "100g", gp: 47.3, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Saunf Moti 100g", qty: "100g", gp: 49.7, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Dhaniya Sabut Sp", qty: "100g", gp: 35.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Khatai (Amchur)", qty: "100g", gp: 25.2, gpClass: "gp-h", color: "#1B6B3A" },
+      ],
+      blendedGP: 38,
+      profit: 151,
+      wa: "🧄 *Basic Masala Pack — sirf ₹399!*\n\nJeera + Hing + Ajwain + Saunf + Dhaniya + Amchur\n\n✅ Roz ki rasoi ke 6 zaroori masale\n✅ Taaza aur asli\n✅ 3-4 mahine chalega\n\nOrder karo aaj 📲 Delivery bhi milegi!"
+    },
+  ],
+  festival: [
+    {
+      emoji: "🪔",
+      name: "Vrat & Upwas Special Pack",
+      tagline: "Navratri, Ekadashi, Shivratri — everything in one",
+      best: true,
+      price: 1299,
+      items: [
+        { name: "Vrat Atta Loose", qty: "2kg", gp: 20.9, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kuttu Giri Atta", qty: "1kg", gp: 13.5, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Samak Rice Loose", qty: "1kg", gp: 13.4, gpClass: "gp-m", color: "#1A4FA0" },
+        { name: "Phool Makhana 100g", qty: "100g×2", gp: 61.2, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Sendha Namak (Shindha)", qty: "1kg", gp: 31.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Ararot Blue Food Grade", qty: "250g", gp: 18.5, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kaju Sabut 250g", qty: "250g", gp: 22.6, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kismis 250g", qty: "250g", gp: 34.9, gpClass: "gp-h", color: "#1B6B3A" },
+      ],
+      blendedGP: 26,
+      profit: 338,
+      wa: "🪔 *Vrat & Upwas Special Pack — ₹1,299*\n\nVrat Atta 2kg + Kuttu Atta 1kg + Samak Rice + Makhana 200g + Sendha Namak + Ararot + Kaju + Kismis\n\n✅ Navratri, Ekadashi, Shivratri ke liye perfect\n✅ Sab kuch ek jagah se\n✅ Pehle order karo, stock limited hai!\n\n📲 WhatsApp karo abhi!"
+    },
+    {
+      emoji: "🌿",
+      name: "Temple & Puja Essentials Pack",
+      tagline: "For temples, pooja needs, and religious events",
+      price: 1999,
+      items: [
+        { name: "Gola Baruda", qty: "1kg", gp: 15.2, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Leaf Plate (30×10)", qty: "1 pkt", gp: 15.9, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Plate Buffer 4cp 13\"", qty: "1 pkt", gp: 17.2, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Silver Plate 6\" 180gsm", qty: "1 pkt", gp: 24.3, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kaju Sabut W320 500g", qty: "500g", gp: 21.9, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Kismis 500g", qty: "500g", gp: 18.5, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Magaj Moti", qty: "250g", gp: 17.0, gpClass: "gp-h", color: "#1B6B3A" },
+        { name: "Mix Pickle Pachranga 4.5kg", qty: "1 jar", gp: 21.9, gpClass: "gp-h", color: "#1B6B3A" },
+      ],
+      blendedGP: 19,
+      profit: 380,
+      wa: "🌿 *Temple & Puja Essentials Pack — ₹1,999*\n\nLeaf Plates + Silver Plates + Dona Buffer + Kaju 500g + Kismis + Magaj + Gola Baruda + Pachranga Pickle\n\n✅ Mandir, langar, bhandara ke liye\n✅ Bulk mein bhi available\n✅ Temple regular customers ke liye special discount bhi milega\n\nInstitutional order ke liye baat karo 📲"
+    },
+  ],
+};
+
+function renderBundles(data, gridId) {
+  const grid = document.getElementById(gridId);
+  data.forEach(b => {
+    const card = document.createElement('div');
+    card.className = 'bundle-card';
+    const itemsHTML = b.items.map(it => `
+      <div class="item-row">
+        <div class="item-left">
+          <div class="item-dot" style="background:${it.color}"></div>
+          <span>${it.name} <span class="item-qty">(${it.qty})</span></span>
+        </div>
+        <span class="gp-tag ${it.gpClass}">${it.gp}% GP</span>
+      </div>
+    `).join('');
+
+    card.innerHTML = `
+      <div class="card-top">
+        ${b.best ? '<span class="best-badge">⭐ START HERE</span>' : ''}
+        <div class="bundle-emoji">${b.emoji}</div>
+        <div class="bundle-name">${b.name}</div>
+        <div class="bundle-tagline">${b.tagline}</div>
+      </div>
+      <div class="items-section">${itemsHTML}</div>
+      <div class="pricing">
+        <div><div class="p-val price">₹${b.price.toLocaleString()}</div><div class="p-lbl">Sell price</div></div>
+        <div><div class="p-val margin">${b.blendedGP}%</div><div class="p-lbl">Blended GP</div></div>
+        <div><div class="p-val profit">~₹${b.profit}</div><div class="p-lbl">Profit/pack</div></div>
+      </div>
+      <div class="wa-section">
+        <div class="wa-label">📱 WhatsApp Message (tap to copy)</div>
+        <div class="wa-msg" onclick="copyMsg(this, \`${b.wa.replace(/`/g, '\\`')}\`)">${b.wa.replace(/\n/g, '<br>')}<span class="copy-hint">👆 Tap to copy message</span></div>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+renderBundles(bundles.daily, 'daily-grid');
+renderBundles(bundles.premium, 'premium-grid');
+renderBundles(bundles.spice, 'spice-grid');
+renderBundles(bundles.festival, 'festival-grid');
+
+function copyMsg(el, msg) {
+  navigator.clipboard.writeText(msg).then(() => {
+    showToast('✅ WhatsApp message copied!');
+  });
+}
+
+function copyAll() {
+  const all = [...bundles.daily, ...bundles.premium, ...bundles.spice, ...bundles.festival];
+  const text = all.map(b => `--- ${b.name} ---\n${b.wa}`).join('\n\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('✅ All 8 messages copied!');
+  });
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+<div class="toast" id="toast"></div>
+</body>
+</html>
