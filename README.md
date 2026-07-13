@@ -2,8 +2,6 @@
 
 Turning one month of raw POS sales data (3,600+ SKUs) into a margin strategy for an independent grocery store: which items to push, which to bundle, and which are quietly losing money.
 
-**[View the live dashboards →](https://YOUR-USERNAME.github.io/grocery-retail-gp-analysis/dashboards/index.html)**
-*(replace `YOUR-USERNAME` after enabling GitHub Pages — see [Deploying](#deploying-to-github-pages) below)*
 
 ---
 
