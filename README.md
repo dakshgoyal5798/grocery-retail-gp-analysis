@@ -78,11 +78,6 @@ python gross_profit_analysis.py
 
 This reads `data/item_wise_gross_profit_apr2026.xlsx` and regenerates every CSV in `/outputs` — the same tiered lists that drive the dashboards.
 
-## Deploying to GitHub Pages
-
-1. Push this repo to GitHub.
-2. Repo **Settings → Pages → Deploy from a branch**, select `main` and `/ (root)` (or `/dashboards` if you'd rather serve that folder directly).
-3. Your live case study will be at `https://YOUR-USERNAME.github.io/grocery-retail-gp-analysis/dashboards/index.html`.
 
 ## Tools used
 
